@@ -1,0 +1,532 @@
+import { useState } from "react";
+
+const SECTIONS = [
+  { id: "medicacion", icon: "💊", label: "Medicación", color: "#2A7B6F" },
+  { id: "comidas", icon: "🍽️", label: "Comidas", color: "#D4A24E" },
+  { id: "bano", icon: "🚿", label: "Baño", color: "#5B8EC9" },
+  { id: "descanso", icon: "😴", label: "Siesta y noche", color: "#9B8EC4" },
+  { id: "corse", icon: "🦴", label: "Corsé y férulas", color: "#7BA68C" },
+  { id: "ocio", icon: "🎶", label: "Ocio y gustos", color: "#E88B6B" },
+  { id: "precauciones", icon: "⚠️", label: "Precauciones", color: "#C9544D" },
+  { id: "faqs", icon: "❓", label: "Preguntas frecuentes", color: "#6B7B8D" },
+];
+
+function Card({ children, style, onClick }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        background: "#fff",
+        borderRadius: 16,
+        padding: "18px 20px",
+        marginBottom: 14,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+        cursor: onClick ? "pointer" : "default",
+        transition: "transform 0.15s ease",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Alert({ children, type = "warning" }) {
+  const colors = {
+    warning: { bg: "#FFF3E0", border: "#E8A84C", icon: "⚠️" },
+    danger: { bg: "#FFEBEE", border: "#C9544D", icon: "🚨" },
+    info: { bg: "#E8F4FD", border: "#5B8EC9", icon: "ℹ️" },
+  };
+  const c = colors[type];
+  return (
+    <div
+      style={{
+        background: c.bg,
+        borderLeft: `4px solid ${c.border}`,
+        borderRadius: 10,
+        padding: "12px 14px",
+        marginTop: 12,
+        marginBottom: 8,
+        fontSize: 14,
+        lineHeight: 1.5,
+      }}
+    >
+      <span style={{ marginRight: 6 }}>{c.icon}</span>
+      {children}
+    </div>
+  );
+}
+
+function MedItem({ name, dose, when, note }) {
+  return (
+    <div style={{ padding: "12px 0", borderBottom: "1px solid #f0eeeb" }}>
+      <div style={{ fontWeight: 700, fontSize: 16, color: "#2D2D2D" }}>{name}</div>
+      <div style={{ fontSize: 15, color: "#555", marginTop: 4 }}>
+        <strong>Dosis:</strong> {dose}
+      </div>
+      <div style={{ fontSize: 15, color: "#555", marginTop: 2 }}>
+        <strong>Cuándo:</strong> {when}
+      </div>
+      {note && (
+        <Alert type={name.includes("rescate") ? "danger" : "warning"}>{note}</Alert>
+      )}
+    </div>
+  );
+}
+
+function MealItem({ time, icon, description, note }) {
+  return (
+    <div style={{ padding: "12px 0", borderBottom: "1px solid #f0eeeb" }}>
+      <div style={{ fontWeight: 700, fontSize: 15, color: "#2D2D2D" }}>
+        {icon} {time}
+      </div>
+      <div style={{ fontSize: 15, color: "#555", marginTop: 4, lineHeight: 1.5 }}>
+        {description}
+      </div>
+      {note && <Alert type="warning">{note}</Alert>}
+    </div>
+  );
+}
+
+function FAQItem({ q, a }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      style={{
+        borderBottom: "1px solid #f0eeeb",
+        padding: "14px 0",
+        cursor: "pointer",
+      }}
+      onClick={() => setOpen(!open)}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div style={{ fontWeight: 600, fontSize: 15, color: "#2D2D2D", flex: 1, paddingRight: 12 }}>
+          {q}
+        </div>
+        <span style={{ fontSize: 18, color: "#999", flexShrink: 0, transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+          ▼
+        </span>
+      </div>
+      {open && (
+        <div style={{ marginTop: 10, fontSize: 15, color: "#555", lineHeight: 1.6, paddingLeft: 2 }}>
+          {a}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionMedicacion() {
+  return (
+    <div>
+      <MedItem
+        name="Movicol"
+        dose="1 sobre"
+        when="Desayuno (mezclado con el batido y los cereales)"
+        note="Se echa al preparar el batido, junto con los cereales."
+      />
+      <MedItem
+        name="Risperidona"
+        dose="0,5 ml"
+        when="Mañana (desayuno) y noche (cena)"
+      />
+      <MedItem
+        name="Diazepam"
+        dose="1,5 ml"
+        when="En la cena"
+      />
+      <MedItem
+        name="Diazepam de rescate"
+        dose="1,5 ml"
+        when="En el desayuno o almuerzo"
+        note="SOLO si llanto persistente e inconsolable durante MÁS DE 2 HORAS. No administrar en otro caso."
+      />
+      <MedItem
+        name="Apiretal"
+        dose="4,8 ml"
+        when="Solo si hay fiebre"
+      />
+      <MedItem
+        name="Melatonina"
+        dose="4 puffs"
+        when="Después de cenar"
+      />
+    </div>
+  );
+}
+
+function SectionComidas() {
+  return (
+    <div>
+      <MealItem time="Desayuno" icon="☀️" description="Batido hipercalórico + cereales (4 cucharadas medianas) + Movicol." note="Los cereales no deben espesar demasiado el batido." />
+      <MealItem time="Media mañana" icon="🥛" description="Yogur o similar." />
+      <MealItem time="Almuerzo" icon="🍲" description="Un plato de comida triturada + postre (petit suisse, natillas…)." />
+      <MealItem time="Merienda" icon="🍎" description="Papilla de frutas." />
+      <MealItem time="Cena" icon="🌙" description="Puré de verduras + postre (petit suisse, gelatina o similar)." />
+    </div>
+  );
+}
+
+function SectionBano() {
+  return (
+    <div>
+      <Card style={{ background: "#F7F9FC" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>🚽 Váter</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Suele hacer caca después de cenar. Ponerla en la taza con el adaptador. Le gusta que le cuenten hasta tres para empujar.
+        </p>
+        <Alert type="danger">NO se le puede dejar sola en ningún momento.</Alert>
+      </Card>
+      <Card style={{ background: "#F7F9FC" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>🚿 Ducha</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          En su silla de ducha. Se ducha en días alternos.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+function SectionDescanso() {
+  return (
+    <div>
+      <Card style={{ background: "#F5F3F9" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>💤 Siesta</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Después de comer. Sin corsé. Aproximadamente 2 horas.
+        </p>
+        <Alert type="warning">Debe tener puesto uno de sus monos para evitar que se coma el pañal.</Alert>
+      </Card>
+      <Card style={{ background: "#F5F3F9" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>🌙 Noche</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Duerme sin corsé, con su pijama enterizo.
+        </p>
+        <Alert type="danger">Revisar que no tenga nada en la boca cuando se haya dormido.</Alert>
+      </Card>
+    </div>
+  );
+}
+
+function SectionCorse() {
+  return (
+    <div>
+      <Card style={{ background: "#F2F7F4" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>🦴 Corsé</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Debe llevarlo puesto todo el día desde que se levanta. Solo se lo quita para la siesta y para dormir.
+        </p>
+      </Card>
+      <Card style={{ background: "#F2F7F4" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>🦵 Férulas de las piernas</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Se le pueden poner durante 2 horas cuando esté tranquila. Lo ideal es todos los días. Si no es posible, en días alternos.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+function SectionOcio() {
+  return (
+    <div>
+      <Card style={{ background: "#FEF6F0" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>💬 Interacción</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Le gusta que le hablen y le pregunten, que le lean cuentos o le canten canciones.
+        </p>
+      </Card>
+      <Card style={{ background: "#FEF6F0" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>🎵 Música (YouTube)</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Cantajuegos, Beatles, Shakira, Bruno Mars, Queen y similares.
+        </p>
+      </Card>
+      <Card style={{ background: "#FEF6F0" }}>
+        <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>🎬 Películas</div>
+        <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0, color: "#444" }}>
+          Bichos, Mary Poppins, Big Hero 6, Nemo, Dory, Blancanieves, La Sirenita.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+function SectionPrecauciones() {
+  return (
+    <div>
+      <Alert type="danger">
+        <strong>Juguetes:</strong> Le gustan los juguetes de plástico con agujeritos y los libros de plástico. Vigilar que no se deshagan y se trague trozos.
+      </Alert>
+      <Alert type="danger">
+        <strong>Cuerdas y cordones:</strong> NO debe coger cuerdas ni cordones porque se los traga.
+      </Alert>
+      <Alert type="warning">
+        <strong>Al dormirse:</strong> Revisar siempre que no tenga nada en la boca.
+      </Alert>
+      <Alert type="warning">
+        <strong>Pañal:</strong> Debe llevar puesto un mono durante la siesta para evitar que se coma el pañal.
+      </Alert>
+    </div>
+  );
+}
+
+function SectionFAQs() {
+  const faqs = [
+    {
+      q: "¿Cuándo le doy el Diazepam de rescate?",
+      a: "Solo si tiene una crisis de llanto persistente e inconsolable durante más de 2 horas. Se le da en el desayuno o en el almuerzo. No administrar de forma preventiva ni por llanto breve.",
+    },
+    {
+      q: "¿Qué hago si tiene fiebre?",
+      a: "Administrar Apiretal, 4,8 ml. Si la fiebre persiste o es alta, contactar a los padres.",
+    },
+    {
+      q: "¿Puedo dejarla sola en el váter?",
+      a: "No, nunca. Debe estar acompañada en todo momento cuando esté en la taza.",
+    },
+    {
+      q: "¿Cuándo se quita el corsé?",
+      a: "Solo para la siesta y para dormir por la noche. El resto del día lo lleva puesto.",
+    },
+    {
+      q: "¿Cada cuánto se ducha?",
+      a: "En días alternos, siempre en su silla de ducha.",
+    },
+    {
+      q: "¿Cuánto dura la siesta?",
+      a: "Aproximadamente 2 horas, después de comer. Sin corsé y con uno de sus monos puestos.",
+    },
+    {
+      q: "¿Qué pasa si encuentra una cuerda o un cordón?",
+      a: "Retirárselo inmediatamente. Se los traga. No debe tener acceso a cuerdas ni cordones.",
+    },
+    {
+      q: "¿Cómo sé si los cereales han espesado demasiado el batido?",
+      a: "Debe tener una textura bebible, tipo batido espeso. Si cuesta beberlo o se queda como papilla, tiene demasiados cereales. Usar 4 cucharadas medianas.",
+    },
+    {
+      q: "¿Qué hago si llora pero lleva menos de 2 horas?",
+      a: "Intentar calmarla hablándole, cantándole, poniéndole música o vídeos que le gustan. El Diazepam de rescate solo se usa a partir de las 2 horas.",
+    },
+    {
+      q: "¿Se le ponen las férulas todos los días?",
+      a: "Lo ideal es todos los días, 2 horas cuando esté tranquila. Si no es posible, en días alternos.",
+    },
+    {
+      q: "¿Por qué debe llevar mono durante la siesta?",
+      a: "Para evitar que se coma el pañal. El mono impide que acceda a él.",
+    },
+    {
+      q: "¿Qué reviso cuando se duerme?",
+      a: "Que no tenga nada en la boca: trozos de juguete, papel, cualquier cosa que haya podido llevarse.",
+    },
+  ];
+
+  return (
+    <div>
+      {faqs.map((f, i) => (
+        <FAQItem key={i} q={f.q} a={f.a} />
+      ))}
+    </div>
+  );
+}
+
+const SECTION_COMPONENTS = {
+  medicacion: SectionMedicacion,
+  comidas: SectionComidas,
+  bano: SectionBano,
+  descanso: SectionDescanso,
+  corse: SectionCorse,
+  ocio: SectionOcio,
+  precauciones: SectionPrecauciones,
+  faqs: SectionFAQs,
+};
+
+export default function App() {
+  const [activeSection, setActiveSection] = useState(null);
+
+  const currentSection = SECTIONS.find((s) => s.id === activeSection);
+  const SectionComponent = activeSection ? SECTION_COMPONENTS[activeSection] : null;
+
+  return (
+    <div
+      style={{
+        fontFamily: '-apple-system, "Segoe UI", Roboto, sans-serif',
+        background: "#F7F5F2",
+        minHeight: "100vh",
+        maxWidth: 480,
+        margin: "0 auto",
+        paddingBottom: 100,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #2A7B6F 0%, #1D5E54 100%)",
+          padding: activeSection ? "16px 20px" : "32px 24px 28px",
+          color: "#fff",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          transition: "padding 0.2s ease",
+        }}
+      >
+        {activeSection ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button
+              onClick={() => setActiveSection(null)}
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                border: "none",
+                color: "#fff",
+                fontSize: 20,
+                borderRadius: 10,
+                width: 38,
+                height: 38,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ←
+            </button>
+            <span style={{ fontSize: 20, marginRight: 4 }}>{currentSection?.icon}</span>
+            <span style={{ fontSize: 18, fontWeight: 700 }}>{currentSection?.label}</span>
+          </div>
+        ) : (
+          <div>
+            <div style={{ fontSize: 28, fontWeight: 800, marginBottom: 4, letterSpacing: -0.5 }}>
+              Casilda 😊
+            </div>
+            <div style={{ fontSize: 15, opacity: 0.85, fontWeight: 400 }}>
+              Guía de cuidados — Aspace Sevilla
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Emergency bar — always visible */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 200,
+          maxWidth: 480,
+          margin: "0 auto",
+          background: "#fff",
+          borderTop: "1px solid #e8e5e0",
+          padding: "10px 16px 14px",
+          display: "flex",
+          gap: 10,
+        }}
+      >
+        <a
+          href="tel:615665639"
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            background: "#2A7B6F",
+            color: "#fff",
+            borderRadius: 12,
+            padding: "12px 8px",
+            textDecoration: "none",
+            fontWeight: 700,
+            fontSize: 14,
+          }}
+        >
+          📞 María (madre)
+        </a>
+        <a
+          href="tel:653636919"
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            background: "#1D5E54",
+            color: "#fff",
+            borderRadius: 12,
+            padding: "12px 8px",
+            textDecoration: "none",
+            fontWeight: 700,
+            fontSize: 14,
+          }}
+        >
+          📞 Luis (padre)
+        </a>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "20px 16px" }}>
+        {!activeSection ? (
+          <>
+            {/* Quick reminder card */}
+            <Card style={{ background: "#E8F4F1", borderLeft: "4px solid #2A7B6F", marginBottom: 20 }}>
+              <div style={{ fontSize: 14, lineHeight: 1.6, color: "#2D4A44" }}>
+                <strong>Recuerda:</strong> Casilda necesita supervisión constante. Revisa la sección de precauciones antes de empezar.
+              </div>
+            </Card>
+
+            {/* Section grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}
+            >
+              {SECTIONS.map((s) => (
+                <div
+                  key={s.id}
+                  onClick={() => setActiveSection(s.id)}
+                  style={{
+                    background: "#fff",
+                    borderRadius: 16,
+                    padding: "20px 16px",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                    borderBottom: `4px solid ${s.color}`,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 8,
+                    transition: "transform 0.12s ease",
+                  }}
+                >
+                  <span style={{ fontSize: 32 }}>{s.icon}</span>
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: "#2D2D2D",
+                      textAlign: "center",
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {s.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div style={{ textAlign: "center", marginTop: 28, fontSize: 12, color: "#aaa", lineHeight: 1.5 }}>
+              Preparado con cariño para el equipo de Aspace Sevilla<br />
+              © Luis Gómez Peñalver · CC BY-NC-SA 4.0
+            </div>
+          </>
+        ) : (
+          <SectionComponent />
+        )}
+      </div>
+    </div>
+  );
+}
